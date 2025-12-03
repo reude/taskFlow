@@ -48,20 +48,32 @@ function TabNavigator() {
 }
 
 export default function AppNavigator() {
+  const { preferences } = useContext(TaskContext);
+  const isDark = preferences.isDarkMode;
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Main" component={TabNavigator} />
-        <Stack.Screen 
-          name="TaskDetails" 
-          component={TaskDetailsScreen} 
-          options={{ 
-            headerShown: true, 
+
+        <Stack.Screen
+          name="TaskDetails"
+          component={TaskDetailsScreen}
+          options={{
+            headerShown: true,
             title: 'Detalhes',
-            headerStyle: { backgroundColor: '#1a1a1a' }, 
-            headerTintColor: '#E74C3C' 
-          }} 
+            // AQUI ESTÁ A MÁGICA:
+            // Se for escuro -> Fundo Preto. Se for claro -> Fundo Branco.
+            headerStyle: {
+              backgroundColor: isDark ? '#1a1a1a' : '#FFFFFF'
+            },
+            // A cor do texto e da setinha de voltar continua Vermelho Tomate
+            headerTintColor: '#E74C3C',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            }
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
