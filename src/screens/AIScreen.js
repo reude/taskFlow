@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet
 import { TaskContext } from '../context/TaskContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const API_KEY = "AIzaSyBjkzw4AMr9HLpFn8UIWD_eLmpTLOGAYJY"; 
+const API_KEY = "."; 
 
 export default function AIScreen() {
   const { tasks, preferences, userName } = useContext(TaskContext);
