@@ -7,27 +7,47 @@ export const TaskContext = createContext();
 
 export const TaskProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
+  
+  // Novas configurações globais
+  const [preferences, setPreferences] = useState({
+    focusTime: 25,   // em minutos
+    breakTime: 5,    // em minutos
+    isDarkMode: false
+  });
 
-  // Carregar tarefas ao abrir o app
+  // Carregar dados
   useEffect(() => {
-    const loadTasks = async () => {
+    const loadData = async () => {
       const storedTasks = await AsyncStorage.getItem('@taskflow_tasks');
+      const storedPrefs = await AsyncStorage.getItem('@taskflow_prefs');
       if (storedTasks) setTasks(JSON.parse(storedTasks));
+      if (storedPrefs) setPreferences(JSON.parse(storedPrefs));
     };
-    loadTasks();
+    loadData();
   }, []);
 
-  // Salvar tarefas sempre que houver mudança
+  // Salvar dados
   useEffect(() => {
-    const saveTasks = async () => {
-      await AsyncStorage.setItem('@taskflow_tasks', JSON.stringify(tasks));
-    };
-    saveTasks();
+    AsyncStorage.setItem('@taskflow_tasks', JSON.stringify(tasks));
   }, [tasks]);
 
+  useEffect(() => {
+    AsyncStorage.setItem('@taskflow_prefs', JSON.stringify(preferences));
+  }, [preferences]);
+
+  // --- Ações de Tarefas ---
   const addTask = (title) => {
-    const newTask = { id: uuidv4(), title, completed: false, focusMinutes: 0 };
+    const newTask = { 
+      id: uuidv4(), 
+      title, 
+      description: '', // Novo campo
+      completed: false 
+    };
     setTasks([...tasks, newTask]);
+  };
+
+  const updateTask = (id, newTitle, newDescription) => {
+    setTasks(tasks.map(t => t.id === id ? { ...t, title: newTitle, description: newDescription } : t));
   };
 
   const toggleTask = (id) => {
@@ -38,8 +58,16 @@ export const TaskProvider = ({ children }) => {
     setTasks(tasks.filter(t => t.id !== id));
   };
 
+  // --- Ações de Preferências ---
+  const updatePreferences = (newPrefs) => {
+    setPreferences(prev => ({ ...prev, ...newPrefs }));
+  };
+
   return (
-    <TaskContext.Provider value={{ tasks, addTask, toggleTask, deleteTask }}>
+    <TaskContext.Provider value={{ 
+      tasks, addTask, toggleTask, deleteTask, updateTask, // Adicionado updateTask
+      preferences, updatePreferences // Adicionados para settings
+    }}>
       {children}
     </TaskContext.Provider>
   );

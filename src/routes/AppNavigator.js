@@ -1,34 +1,42 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { TaskContext } from '../context/TaskContext';
 
-// Importar as telas
 import WelcomeScreen from '../screens/WelcomeScreen';
 import TasksScreen from '../screens/TasksScreen';
 import PomodoroScreen from '../screens/PomodoroScreen';
 import AIScreen from '../screens/AIScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import TaskDetailsScreen from '../screens/TaskDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
+  const { preferences } = useContext(TaskContext);
+  const isDark = preferences.isDarkMode;
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: isDark ? '#1a1a1a' : '#fff',
+          borderTopColor: isDark ? '#333' : '#eee',
+        },
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: 'gray',
         tabBarIcon: ({ color, size }) => {
           let iconName;
-          if (route.name === 'Tarefas') iconName = 'list';
+          if (route.name === 'Tarefas') iconName = 'checkbox';
           else if (route.name === 'Pomodoro') iconName = 'timer';
           else if (route.name === 'Relatório IA') iconName = 'analytics';
           else if (route.name === 'Config') iconName = 'settings';
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: 'tomato',
-        tabBarInactiveTintColor: 'gray',
       })}
     >
       <Tab.Screen name="Tarefas" component={TasksScreen} />
@@ -45,6 +53,16 @@ export default function AppNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Main" component={TabNavigator} />
+        <Stack.Screen 
+          name="TaskDetails" 
+          component={TaskDetailsScreen} 
+          options={{ 
+            headerShown: true, 
+            title: 'Detalhes',
+            headerStyle: { backgroundColor: '#1a1a1a' }, 
+            headerTintColor: '#fff' 
+          }} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

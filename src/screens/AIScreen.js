@@ -1,15 +1,23 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, Button, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 import { TaskContext } from '../context/TaskContext';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// ATENÇÃO: Coloque sua chave aqui (idealmente use variáveis de ambiente)
-const API_KEY = "SUA_CHAVE_API_DO_GOOGLE_AQUI"; 
+const API_KEY = "AIzaSyA3YTlfo-_SA8jfei8vbIWBNM8b6RYHmqM"; 
 
 export default function AIScreen() {
-  const { tasks } = useContext(TaskContext);
-  const [report, setReport] = useState("Clique no botão para gerar um relatório.");
+  const { tasks, preferences } = useContext(TaskContext);
+  const { isDarkMode } = preferences;
+  const [report, setReport] = useState("Clique no botão para analisar sua produtividade.");
   const [loading, setLoading] = useState(false);
+
+  const theme = {
+    bg: isDarkMode ? '#121212' : '#f5f5f5',
+    card: isDarkMode ? '#1e1e1e' : '#fff',
+    text: isDarkMode ? '#eee' : '#333',
+    primary: '#6c5ce7'
+  };
 
   const generateReport = async () => {
     setLoading(true);
@@ -20,32 +28,47 @@ export default function AIScreen() {
       const completedCount = tasks.filter(t => t.completed).length;
       const totalCount = tasks.length;
       
-      const prompt = `Aja como um coach de produtividade. O usuário completou ${completedCount} de ${totalCount} tarefas hoje. As tarefas são: ${tasks.map(t => t.title).join(", ")}. Dê um feedback curto e motivacional de 3 frases.`;
+      const prompt = `Aja como um coach de produtividade. O usuário completou ${completedCount} de ${totalCount} tarefas hoje. As tarefas são: ${tasks.map(t => t.title).join(", ")}. Dê um feedback curto, direto e motivacional de até 300 caracteres. Use emojis.`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
       setReport(response.text());
     } catch (error) {
-      setReport("Erro ao conectar com a IA. Verifique sua internet ou a chave API.");
-      console.error(error);
+      setReport("Erro de conexão. Verifique sua internet.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Coach Virtual 🤖</Text>
-      <ScrollView style={styles.resultBox}>
-        <Text style={styles.text}>{report}</Text>
-      </ScrollView>
-      {loading ? <ActivityIndicator size="large" color="#0000ff" /> : <Button title="Gerar Relatório" onPress={generateReport} />}
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      <View style={{ alignItems: 'center', marginBottom: 20 }}>
+        <MaterialCommunityIcons name="robot-excited" size={60} color={theme.primary} />
+        <Text style={[styles.title, { color: theme.text }]}>Coach Virtual</Text>
+      </View>
+
+      <View style={[styles.resultBox, { backgroundColor: theme.card }]}>
+        <ScrollView>
+          <Text style={[styles.text, { color: theme.text }]}>{report}</Text>
+        </ScrollView>
+      </View>
+
+      {loading ? (
+        <ActivityIndicator size="large" color={theme.primary} />
+      ) : (
+        <TouchableOpacity style={[styles.btn, { backgroundColor: theme.primary }]} onPress={generateReport}>
+          <Text style={styles.btnText}>Gerar Relatório</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, paddingTop: 50 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-  resultBox: { flex: 1, backgroundColor: '#f0f0f0', padding: 15, borderRadius: 10, marginBottom: 20 },
-  text: { fontSize: 16, lineHeight: 24 }
+  container: { flex: 1, padding: 20, paddingTop: 60 },
+  title: { fontSize: 24, fontWeight: 'bold', marginTop: 10 },
+  resultBox: { flex: 1, padding: 20, borderRadius: 15, marginBottom: 20, elevation: 2 },
+  text: { fontSize: 18, lineHeight: 28 },
+  btn: { padding: 15, borderRadius: 12, alignItems: 'center', elevation: 3 },
+  btnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' }
 });
