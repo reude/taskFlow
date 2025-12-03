@@ -4,7 +4,7 @@ import { TaskContext } from '../context/TaskContext';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const API_KEY = "AIzaSyA3YTlfo-_SA8jfei8vbIWBNM8b6RYHmqM"; 
+const API_KEY = "."; 
 
 export default function AIScreen() {
   const { tasks, preferences } = useContext(TaskContext);
