@@ -63,12 +63,9 @@ export default function AppNavigator() {
           options={{
             headerShown: true,
             title: 'Detalhes',
-            // AQUI ESTÁ A MÁGICA:
-            // Se for escuro -> Fundo Preto. Se for claro -> Fundo Branco.
             headerStyle: {
               backgroundColor: isDark ? '#1a1a1a' : '#FFFFFF'
             },
-            // A cor do texto e da setinha de voltar continua Vermelho Tomate
             headerTintColor: '#E74C3C',
             headerTitleStyle: {
               fontWeight: 'bold',
