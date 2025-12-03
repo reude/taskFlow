@@ -1,13 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 import { TaskContext } from '../context/TaskContext';
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const API_KEY = "."; 
+const API_KEY = ","; 
 
 export default function AIScreen() {
-  const { tasks, preferences } = useContext(TaskContext);
+  const { tasks, preferences, userName } = useContext(TaskContext);
   const { isDarkMode } = preferences;
   const [report, setReport] = useState("Clique no botão para analisar sua produtividade.");
   const [loading, setLoading] = useState(false);
@@ -16,25 +15,49 @@ export default function AIScreen() {
     bg: isDarkMode ? '#121212' : '#f5f5f5',
     card: isDarkMode ? '#1e1e1e' : '#fff',
     text: isDarkMode ? '#eee' : '#333',
-    primary: '#6c5ce7'
+    primary: '#E74C3C'
   };
 
   const generateReport = async () => {
+    if (!API_KEY || API_KEY.includes(".")) {
+        setReport("Erro: Você precisa colar a chave da API no código");
+        return;
+    }
+
     setLoading(true);
     try {
-      const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-
       const completedCount = tasks.filter(t => t.completed).length;
       const totalCount = tasks.length;
+      const taskNames = tasks.map(t => t.title).join(", ");
       
-      const prompt = `Aja como um coach de produtividade. O usuário completou ${completedCount} de ${totalCount} tarefas hoje. As tarefas são: ${tasks.map(t => t.title).join(", ")}. Dê um feedback curto, direto e motivacional de até 300 caracteres. Use emojis.`;
+      const prompt = `Aja como um coach de produtividade. O usuário se chama ${userName || "Estudante"}. Ele completou ${completedCount} de ${totalCount} tarefas hoje. Tarefas: ${taskNames}. Dê um feedback curto e motivacional (max 3 frases) com emojis.`;
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      setReport(response.text());
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.error) {
+        setReport(`Erro da API: ${data.error.message}`);
+      } else if (data.candidates && data.candidates.length > 0) {
+        setReport(data.candidates[0].content.parts[0].text);
+      } else {
+        setReport("A IA não retornou nenhuma resposta. Tente novamente.");
+      }
+
     } catch (error) {
       setReport("Erro de conexão. Verifique sua internet.");
+      console.error(error);
     } finally {
       setLoading(false);
     }

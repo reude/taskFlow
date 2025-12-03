@@ -1,10 +1,36 @@
-import React, { useContext } from 'react';
-import { View, Text, Switch, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, Switch, TextInput, StyleSheet } from 'react-native';
 import { TaskContext } from '../context/TaskContext';
 
 export default function SettingsScreen() {
   const { preferences, updatePreferences } = useContext(TaskContext);
   const { isDarkMode, focusTime, breakTime } = preferences;
+
+  const [localFocus, setLocalFocus] = useState(String(focusTime));
+  const [localBreak, setLocalBreak] = useState(String(breakTime));
+
+  useEffect(() => {
+    setLocalFocus(String(focusTime));
+    setLocalBreak(String(breakTime));
+  }, [focusTime, breakTime]);
+
+  const handleBlurFocus = () => {
+    const val = parseInt(localFocus);
+    if (!isNaN(val) && val > 0) {
+      updatePreferences({ focusTime: val });
+    } else {
+      setLocalFocus(String(focusTime));
+    }
+  };
+
+  const handleBlurBreak = () => {
+    const val = parseInt(localBreak);
+    if (!isNaN(val) && val > 0) {
+      updatePreferences({ breakTime: val });
+    } else {
+      setLocalBreak(String(breakTime));
+    }
+  };
 
   const theme = {
     bg: isDarkMode ? '#1a1a1a' : '#fff',
@@ -20,7 +46,9 @@ export default function SettingsScreen() {
         <Text style={{ fontSize: 18, color: theme.text }}>Modo Escuro 🌙</Text>
         <Switch 
           value={isDarkMode} 
-          onValueChange={(val) => updatePreferences({ isDarkMode: val })} 
+          onValueChange={(val) => updatePreferences({ isDarkMode: val })}
+          trackColor={{ false: "#767577", true: "#E74C3C" }}
+          thumbColor={isDarkMode ? "#fff" : "#f4f3f4"}
         />
       </View>
 
@@ -32,8 +60,9 @@ export default function SettingsScreen() {
           <TextInput 
             style={[styles.input, { color: theme.text, backgroundColor: theme.inputBg }]}
             keyboardType="numeric"
-            value={String(focusTime)}
-            onChangeText={(val) => updatePreferences({ focusTime: Number(val) || 25 })}
+            value={localFocus}
+            onChangeText={setLocalFocus}
+            onBlur={handleBlurFocus}
           />
         </View>
 
@@ -42,8 +71,9 @@ export default function SettingsScreen() {
           <TextInput 
             style={[styles.input, { color: theme.text, backgroundColor: theme.inputBg }]}
             keyboardType="numeric"
-            value={String(breakTime)}
-            onChangeText={(val) => updatePreferences({ breakTime: Number(val) || 5 })}
+            value={localBreak}
+            onChangeText={setLocalBreak}
+            onBlur={handleBlurBreak}
           />
         </View>
       </View>

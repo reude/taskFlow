@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TaskContext } from '../context/TaskContext';
 
 export default function PomodoroScreen({ route }) {
@@ -11,8 +10,7 @@ export default function PomodoroScreen({ route }) {
 
   const [seconds, setSeconds] = useState(focusTime * 60);
   const [isActive, setIsActive] = useState(false);
-  const [mode, setMode] = useState('focus');
-
+  const [mode, setMode] = useState('focus'); 
 
   useEffect(() => {
     if (!isActive) {
@@ -52,8 +50,11 @@ export default function PomodoroScreen({ route }) {
   const theme = {
     bg: isDarkMode ? '#1a1a1a' : '#fff',
     text: isDarkMode ? '#fff' : '#333',
-    tomato: mode === 'focus' ? '#e74c3c' : '#2ecc71' // Vermelho foco, Verde descanso
+    primary: '#E74C3C',
+    secondary: '#2ecc71'
   };
+
+  const currentColor = mode === 'focus' ? theme.primary : theme.secondary;
 
   return (
     <View style={[styles.container, { backgroundColor: theme.bg }]}>
@@ -64,14 +65,15 @@ export default function PomodoroScreen({ route }) {
       <Text style={[styles.taskLabel, { color: theme.text }]}>{taskName}</Text>
 
       <View style={styles.timerContainer}>
-        <MaterialCommunityIcons name="timer-sand" size={280} color={theme.tomato} style={{ opacity: 0.1, position: 'absolute' }} />
-        <MaterialCommunityIcons name="fruit-cherries" size={60} color={theme.tomato} style={{marginBottom: 20}} />
-        <Text style={[styles.timer, { color: theme.tomato }]}>{formatTime(seconds)}</Text>
+        <Text style={{ fontSize: 120 }}>
+            {mode === 'focus' ? "🍅" : "☕"}
+        </Text>
+        <Text style={[styles.timer, { color: currentColor }]}>{formatTime(seconds)}</Text>
       </View>
 
       <View style={styles.buttons}>
         <TouchableOpacity 
-          style={[styles.btn, { backgroundColor: theme.tomato }]} 
+          style={[styles.btn, { backgroundColor: currentColor }]} 
           onPress={() => setIsActive(!isActive)}
         >
           <Text style={styles.btnText}>{isActive ? "PAUSAR" : "INICIAR"}</Text>
@@ -91,9 +93,9 @@ export default function PomodoroScreen({ route }) {
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   modeTitle: { fontSize: 32, fontWeight: 'bold', marginBottom: 10 },
-  taskLabel: { fontSize: 18, fontStyle: 'italic', marginBottom: 40, opacity: 0.7 },
+  taskLabel: { fontSize: 18, fontStyle: 'italic', marginBottom: 30, opacity: 0.7 },
   timerContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 50 },
-  timer: { fontSize: 90, fontWeight: 'bold', fontVariant: ['tabular-nums'] },
+  timer: { fontSize: 90, fontWeight: 'bold', fontVariant: ['tabular-nums'], marginTop: 10 },
   buttons: { flexDirection: 'row', gap: 20 },
   btn: { paddingVertical: 15, paddingHorizontal: 30, borderRadius: 30, elevation: 5 },
   btnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' }

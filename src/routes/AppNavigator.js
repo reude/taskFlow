@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import { NavigationContainer } from '@react-navigation/native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TaskContext } from '../context/TaskContext';
 
 import WelcomeScreen from '../screens/WelcomeScreen';
@@ -27,15 +27,15 @@ function TabNavigator() {
           backgroundColor: isDark ? '#1a1a1a' : '#fff',
           borderTopColor: isDark ? '#333' : '#eee',
         },
-        tabBarActiveTintColor: '#007AFF',
+        tabBarActiveTintColor: '#E74C3C',
         tabBarInactiveTintColor: 'gray',
         tabBarIcon: ({ color, size }) => {
           let iconName;
-          if (route.name === 'Tarefas') iconName = 'checkbox';
-          else if (route.name === 'Pomodoro') iconName = 'timer';
-          else if (route.name === 'Relatório IA') iconName = 'analytics';
-          else if (route.name === 'Config') iconName = 'settings';
-          return <Ionicons name={iconName} size={size} color={color} />;
+          if (route.name === 'Tarefas') iconName = 'checkbox-marked-outline';
+          else if (route.name === 'Pomodoro') iconName = 'clock-outline';
+          else if (route.name === 'Relatório IA') iconName = 'robot';
+          else if (route.name === 'Config') iconName = 'cog-outline';
+          return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
         },
       })}
     >
@@ -60,7 +60,7 @@ export default function AppNavigator() {
             headerShown: true, 
             title: 'Detalhes',
             headerStyle: { backgroundColor: '#1a1a1a' }, 
-            headerTintColor: '#fff' 
+            headerTintColor: '#E74C3C' 
           }} 
         />
       </Stack.Navigator>

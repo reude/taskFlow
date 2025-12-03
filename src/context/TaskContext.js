@@ -7,26 +7,27 @@ export const TaskContext = createContext();
 
 export const TaskProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
+  const [userName, setUserName] = useState('');
   
-  // Novas configurações globais
   const [preferences, setPreferences] = useState({
-    focusTime: 25,   // em minutos
-    breakTime: 5,    // em minutos
+    focusTime: 25,
+    breakTime: 5,
     isDarkMode: false
   });
 
-  // Carregar dados
   useEffect(() => {
     const loadData = async () => {
       const storedTasks = await AsyncStorage.getItem('@taskflow_tasks');
       const storedPrefs = await AsyncStorage.getItem('@taskflow_prefs');
+      const storedName = await AsyncStorage.getItem('@taskflow_username');
+      
       if (storedTasks) setTasks(JSON.parse(storedTasks));
       if (storedPrefs) setPreferences(JSON.parse(storedPrefs));
+      if (storedName) setUserName(storedName);
     };
     loadData();
   }, []);
 
-  // Salvar dados
   useEffect(() => {
     AsyncStorage.setItem('@taskflow_tasks', JSON.stringify(tasks));
   }, [tasks]);
@@ -35,12 +36,15 @@ export const TaskProvider = ({ children }) => {
     AsyncStorage.setItem('@taskflow_prefs', JSON.stringify(preferences));
   }, [preferences]);
 
-  // --- Ações de Tarefas ---
+  useEffect(() => {
+    AsyncStorage.setItem('@taskflow_username', userName);
+  }, [userName]);
+
   const addTask = (title) => {
     const newTask = { 
       id: uuidv4(), 
       title, 
-      description: '', // Novo campo
+      description: '', 
       completed: false 
     };
     setTasks([...tasks, newTask]);
@@ -58,15 +62,15 @@ export const TaskProvider = ({ children }) => {
     setTasks(tasks.filter(t => t.id !== id));
   };
 
-  // --- Ações de Preferências ---
   const updatePreferences = (newPrefs) => {
     setPreferences(prev => ({ ...prev, ...newPrefs }));
   };
 
   return (
     <TaskContext.Provider value={{ 
-      tasks, addTask, toggleTask, deleteTask, updateTask, // Adicionado updateTask
-      preferences, updatePreferences // Adicionados para settings
+      tasks, addTask, toggleTask, deleteTask, updateTask,
+      preferences, updatePreferences,
+      userName, setUserName
     }}>
       {children}
     </TaskContext.Provider>

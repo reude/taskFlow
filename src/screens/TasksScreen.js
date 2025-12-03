@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 28, fontWeight: 'bold', marginBottom: 20 },
   inputContainer: { flexDirection: 'row', marginBottom: 20, alignItems: 'center' },
   input: { flex: 1, height: 50, paddingHorizontal: 15, borderRadius: 12, marginRight: 10, fontSize: 16, elevation: 2 },
-  addButton: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#007AFF', justifyContent: 'center', alignItems: 'center', elevation: 3 },
+  addButton: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#E74C3C', justifyContent: 'center', alignItems: 'center', elevation: 3 },
   card: { flexDirection: 'row', padding: 15, marginBottom: 10, borderRadius: 12, alignItems: 'center', elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4 },
   taskText: { fontSize: 16, fontWeight: '500' },
   completed: { textDecorationLine: 'line-through', opacity: 0.5 }
